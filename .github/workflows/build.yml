@@ -21,5 +21,17 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
 
+      # 【重点加在这里】给 gradlew 赋权
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
       - name: Build with Gradle
         run: ./gradlew build
+
+      # 顺便把下载产物也加上
+      - name: Upload JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: mod-jar
+          path: build/libs/*.jar
+          if-no-files-found: error
