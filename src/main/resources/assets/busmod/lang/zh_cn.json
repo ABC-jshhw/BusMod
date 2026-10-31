@@ -1,0 +1,10 @@
+{
+  "block.busmod.bus_stop": "公交车站",
+  "itemGroup.busmod": "公交模组",
+  "gui.busmod.bus_stop.name": "站名",
+  "gui.busmod.bus_stop.name_hint": "例如：中央车站",
+  "gui.busmod.bus_stop.id": "站点编号",
+  "gui.busmod.bus_stop.id_hint": "例如：001",
+  "gui.busmod.bus_stop.save": "保存",
+  "message.busmod.bus_stop.saved": "公交车站已更新"
+}

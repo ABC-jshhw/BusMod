@@ -1,0 +1,10 @@
+{
+  "block.busmod.bus_stop": "Bus Stop",
+  "itemGroup.busmod": "Bus Mod",
+  "gui.busmod.bus_stop.name": "Stop Name",
+  "gui.busmod.bus_stop.name_hint": "e.g. Central Station",
+  "gui.busmod.bus_stop.id": "Stop ID",
+  "gui.busmod.bus_stop.id_hint": "e.g. 001",
+  "gui.busmod.bus_stop.save": "Save",
+  "message.busmod.bus_stop.saved": "Bus stop updated"
+}

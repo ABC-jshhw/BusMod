@@ -1,25 +1,65 @@
 
-Installation information
-=======
+# Bus Mod
 
-This template repository can be directly cloned to get you started with a new
-mod. Simply create a new repository cloned from this one, by following the
-instructions provided by [GitHub](https://docs.github.com/en/repositories/creating-and-managing-repositories/creating-a-repository-from-a-template).
+A small NeoForge mod for Minecraft **1.21.1** that adds a decorative and
+configurable bus stop block.
 
-Once you have your clone, simply open the repository in the IDE of your choice. The usual recommendation for an IDE is either IntelliJ IDEA or Eclipse.
+## Features
 
-If at any point you are missing libraries in your IDE, or you've run into problems you can
-run `gradlew --refresh-dependencies` to refresh the local cache. `gradlew clean` to reset everything 
-{this does not affect your code} and then start the process again.
+- **Bus Stop block** – a small station model with a roof, back wall, bench and
+  a front sign. It rotates to face the player when placed.
+- **Editable stop data** – right-click the block to open a screen where you can
+  set a stop name and a stop id (32 characters each).
+- **Floating label** – the configured name and id are rendered above the block
+  and are visible to every player. The data is saved in the chunk and synced
+  from the server.
+- **Crafting recipe** – iron ingots, smooth stone and oak planks:
 
-Mapping Names:
-============
-By default, the MDK is configured to use the official mapping names from Mojang for methods and fields 
-in the Minecraft codebase. These names are covered by a specific license. All modders should be aware of this
-license. For the latest license text, refer to the mapping file itself, or the reference copy here:
-https://github.com/NeoForged/NeoForm/blob/main/Mojang.md
+  ```
+  III
+  SSS
+  P P
+  ```
 
-Additional Resources: 
-==========
-Community Documentation: https://docs.neoforged.net/  
-NeoForged Discord: https://discord.neoforged.net/
+  (`I` = iron ingot, `S` = smooth stone, `P` = oak planks)
+- **Creative tab** – the block is available in the *Bus Mod* creative tab and
+  in the vanilla *Functional Blocks* tab.
+- **Localization** – English (`en_us`) and Simplified Chinese (`zh_cn`).
+
+## Requirements
+
+- Minecraft 1.21.1
+- NeoForge 21.1.264 or newer
+- Java 21
+
+## Building
+
+```bash
+./gradlew build
+```
+
+The mod jar is written to `build/libs/busmod-1.0.0.jar`.
+
+The GitHub Actions workflow in `.github/workflows/build.yml` runs the same
+build on every push and uploads the resulting jar as an artifact.
+
+## Development
+
+- Main mod class: `com.example.busmod.BusMod`
+- Client hooks: `com.example.busmod.BusModClient`
+- Block and block entity: `com.example.busmod.block`
+- Screen and block entity renderer: `com.example.busmod.client`
+- Registries: `com.example.busmod.registry`
+- Network payload: `com.example.busmod.network`
+
+Run the client with:
+
+```bash
+./gradlew runClient
+```
+
+## License
+
+All Rights Reserved. See `TEMPLATE_LICENSE.txt` for the template license.
+
+The project is based on the NeoForge Mod Developer Kit (MDK).
