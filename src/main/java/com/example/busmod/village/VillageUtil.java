@@ -68,7 +68,7 @@ public final class VillageUtil {
             Holder.Reference<Structure> holder = holderOpt.get();
             Optional<StructureStart> start = level.structureManager()
                     .getStartForStructure(SectionPos.of(chunkPos, level.getMinSection()), holder.value(),
-                            level.getChunkSource().getGenerator());
+                            level.getChunkSource());
             if (start.isEmpty()) {
                 continue;
             }
