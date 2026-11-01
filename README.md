@@ -1,5 +1,5 @@
 
-# Bus Mod
+#3 Bus Mod
 
 A small NeoForge mod for Minecraft **1.21.1** that adds a decorative and
 configurable bus stop block.
