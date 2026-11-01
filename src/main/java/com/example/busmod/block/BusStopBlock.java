@@ -102,17 +102,29 @@ public class BusStopBlock extends BaseEntityBlock {
         return Map.copyOf(shapes);
     }
 
+    /**
+     * Mirrors the element list of {@code models/block/bus_stop.json} so the
+     * collision and selection boxes match what the player sees.
+     */
     private static VoxelShape createShape(Direction facing) {
         return Shapes.or(
                 box(facing, 0.0D, 0.0D, 0.0D, 16.0D, 1.0D, 16.0D), // base
-                box(facing, 0.0D, 12.0D, 0.0D, 16.0D, 16.0D, 16.0D), // roof
+                box(facing, 0.0D, 12.0D, 0.0D, 16.0D, 13.0D, 16.0D), // roof trim
+                box(facing, 0.0D, 13.0D, 0.0D, 16.0D, 15.0D, 16.0D), // roof
+                box(facing, 0.0D, 15.0D, 0.0D, 16.0D, 16.0D, 16.0D), // roof cap
                 box(facing, 0.5D, 1.0D, 0.5D, 1.5D, 13.0D, 1.5D), // posts
                 box(facing, 14.5D, 1.0D, 0.5D, 15.5D, 13.0D, 1.5D),
                 box(facing, 0.5D, 1.0D, 14.5D, 1.5D, 13.0D, 15.5D),
                 box(facing, 14.5D, 1.0D, 14.5D, 15.5D, 13.0D, 15.5D),
-                box(facing, 1.5D, 1.0D, 14.5D, 14.5D, 12.0D, 15.5D), // back wall
+                box(facing, 1.5D, 1.0D, 14.5D, 14.5D, 3.0D, 15.5D), // back wall (lower)
+                box(facing, 1.5D, 10.0D, 14.5D, 14.5D, 12.0D, 15.5D), // back wall (upper)
+                box(facing, 1.5D, 3.0D, 14.5D, 4.0D, 10.0D, 15.5D), // back wall (left)
+                box(facing, 12.0D, 3.0D, 14.5D, 14.5D, 10.0D, 15.5D), // back wall (right)
+                box(facing, 7.75D, 3.0D, 14.5D, 8.25D, 10.0D, 15.5D), // back wall (mullion)
                 box(facing, 3.0D, 7.0D, 0.0D, 13.0D, 12.0D, 0.5D), // sign
-                box(facing, 3.0D, 1.0D, 11.5D, 13.0D, 4.5D, 14.0D)); // bench
+                box(facing, 3.0D, 4.0D, 11.5D, 13.0D, 4.5D, 14.0D), // bench seat
+                box(facing, 3.5D, 1.0D, 12.0D, 4.5D, 4.0D, 13.0D), // bench legs
+                box(facing, 11.5D, 1.0D, 12.0D, 12.5D, 4.0D, 13.0D));
     }
 
     /**

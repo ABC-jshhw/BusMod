@@ -14,10 +14,14 @@ import net.minecraft.network.chat.Component;
 
 /**
  * Renders the stop name and stop id as a floating label above the bus stop.
+ * The label is drawn with {@link Font.DisplayMode#NORMAL} so it is occluded by
+ * blocks in front of it, which keeps it from shining through walls.
  */
 public class BusStopRenderer implements BlockEntityRenderer<BusStopBlockEntity> {
     private static final float TEXT_SCALE = 0.025F;
     private static final int BACKGROUND_COLOR = 0x40000000;
+    private static final double LABEL_HEIGHT = 1.02D;
+    private static final double MAX_RENDER_DISTANCE = 32.0D;
 
     public BusStopRenderer(BlockEntityRendererProvider.Context context) {
     }
@@ -35,20 +39,25 @@ public class BusStopRenderer implements BlockEntityRenderer<BusStopBlockEntity> 
         Component idComponent = stopId.isEmpty() ? null : Component.literal("[" + stopId + "]");
 
         poseStack.pushPose();
-        poseStack.translate(0.5D, 1.02D, 0.5D);
+        poseStack.translate(0.5D, LABEL_HEIGHT, 0.5D);
         poseStack.mulPose(Minecraft.getInstance().getEntityRenderDispatcher().cameraOrientation());
         poseStack.scale(TEXT_SCALE, -TEXT_SCALE, TEXT_SCALE);
         Matrix4f matrix = poseStack.last().pose();
 
         float nameY = idComponent == null ? 0.0F : -10.0F;
         font.drawInBatch(nameComponent, -font.width(nameComponent) / 2.0F, nameY, 0xFFFFFFFF, false, matrix,
-                bufferSource, Font.DisplayMode.SEE_THROUGH, BACKGROUND_COLOR, packedLight);
+                bufferSource, Font.DisplayMode.NORMAL, BACKGROUND_COLOR, packedLight);
 
         if (idComponent != null) {
             font.drawInBatch(idComponent, -font.width(idComponent) / 2.0F, 0.0F, 0xFFFFD54F, false, matrix,
-                    bufferSource, Font.DisplayMode.SEE_THROUGH, BACKGROUND_COLOR, packedLight);
+                    bufferSource, Font.DisplayMode.NORMAL, BACKGROUND_COLOR, packedLight);
         }
 
         poseStack.popPose();
+    }
+
+    @Override
+    public int getViewDistance() {
+        return (int) MAX_RENDER_DISTANCE;
     }
 }

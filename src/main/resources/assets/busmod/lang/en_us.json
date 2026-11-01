@@ -6,5 +6,6 @@
   "gui.busmod.bus_stop.id": "Stop ID",
   "gui.busmod.bus_stop.id_hint": "e.g. 001",
   "gui.busmod.bus_stop.save": "Save",
-  "message.busmod.bus_stop.saved": "Bus stop updated"
+  "message.busmod.bus_stop.saved": "Bus stop updated",
+  "message.busmod.bus_stop.no_permission": "You are not allowed to edit this bus stop"
 }

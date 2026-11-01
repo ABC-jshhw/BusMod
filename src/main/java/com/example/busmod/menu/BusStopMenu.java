@@ -1,6 +1,7 @@
 package com.example.busmod.menu;
 
 import com.example.busmod.block.BusStopBlockEntity;
+import com.example.busmod.network.SetBusStopInfoPayload;
 import com.example.busmod.registry.ModBlocks;
 import com.example.busmod.registry.ModMenus;
 
@@ -52,9 +53,13 @@ public class BusStopMenu extends AbstractContainerMenu {
         return this.stopId;
     }
 
+    /**
+     * Uses the same distance as {@link SetBusStopInfoPayload#MAX_EDIT_DISTANCE}
+     * so the screen closes exactly when the server would reject an update.
+     */
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(this.access, player, ModBlocks.BUS_STOP.get());
+        return stillValid(this.access, player, ModBlocks.BUS_STOP.get(), SetBusStopInfoPayload.MAX_EDIT_DISTANCE);
     }
 
     @Override

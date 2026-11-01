@@ -7,12 +7,19 @@ configurable bus stop block.
 ## Features
 
 - **Bus Stop block** – a small station model with a roof, back wall, bench and
-  a front sign. It rotates to face the player when placed.
+  a front sign. It rotates to face the player when placed. The collision and
+  selection boxes mirror the model elements, so you can walk into the shelter
+  and sit on the bench area.
 - **Editable stop data** – right-click the block to open a screen where you can
-  set a stop name and a stop id (32 characters each).
+  set a stop name and a stop id (32 characters each). Control characters and
+  `§` formatting codes are stripped before the values are stored.
 - **Floating label** – the configured name and id are rendered above the block
-  and are visible to every player. The data is saved in the chunk and synced
-  from the server.
+  and are visible to every player. The label is depth-tested (it does not shine
+  through walls) and is culled beyond 32 blocks. The data is saved in the chunk
+  and synced from the server.
+- **Permission check** – only creative-mode players and operators (permission
+  level 2) may rename a stop; everyone else gets a "no permission" message.
+  The server also rejects updates sent from more than 4 blocks away.
 - **Crafting recipe** – iron ingots, smooth stone and oak planks:
 
   ```
@@ -41,7 +48,9 @@ configurable bus stop block.
 The mod jar is written to `build/libs/busmod-1.0.0.jar`.
 
 The GitHub Actions workflow in `.github/workflows/build.yml` runs the same
-build on every push and uploads the resulting jar as an artifact.
+build on every push and uploads the resulting jar as an artifact. Compilation
+is intentionally delegated to CI; the local machine only needs a JDK 21 for
+syntax checks.
 
 ## Development
 

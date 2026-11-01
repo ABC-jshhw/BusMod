@@ -6,5 +6,6 @@
   "gui.busmod.bus_stop.id": "站点编号",
   "gui.busmod.bus_stop.id_hint": "例如：001",
   "gui.busmod.bus_stop.save": "保存",
-  "message.busmod.bus_stop.saved": "公交车站已更新"
+  "message.busmod.bus_stop.saved": "公交车站已更新",
+  "message.busmod.bus_stop.no_permission": "你没有权限修改该公交车站"
 }

@@ -92,7 +92,7 @@ neoForge {
 
             // Recommended logging level for the console
             // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
+            // Please read: https://stackoverflow.com/questions/2031163/how-to-set-the-different-log-levels
             logLevel = org.slf4j.event.Level.DEBUG
         }
     }
@@ -163,7 +163,9 @@ sourceSets.main.resources.srcDir generateModMetadata
 // To avoid having to run "generateModMetadata" manually, make it run on every project reload
 neoForge.ideSyncTask generateModMetadata
 
-// Example configuration to allow publishing using the maven-publish plugin
+// Example configuration to allow publishing using the maven-publish plugin.
+// The repository is only added when a publish target is explicitly requested, so a plain
+// `./gradlew build` never writes into the project directory.
 publishing {
     publications {
         register('mavenJava', MavenPublication) {
@@ -172,7 +174,8 @@ publishing {
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/repo"
+            name = 'local'
+            url = layout.buildDirectory.dir('repo')
         }
     }
 }

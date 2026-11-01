@@ -11,16 +11,20 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 /**
  * Sent by the client when the player clicks "Save" in the bus stop screen.
- * The server validates the block and the interaction distance before the
- * values are applied.
+ * The server validates the block, the interaction distance and the player's
+ * permission before the values are applied.
  */
 public record SetBusStopInfoPayload(BlockPos pos, String name, String id) implements CustomPacketPayload {
+    /** Maximum distance between player and block for editing, in blocks. */
+    public static final double MAX_EDIT_DISTANCE = 4.0D;
+
     public static final Type<SetBusStopInfoPayload> TYPE =
             new Type<>(ResourceLocation.fromNamespaceAndPath(BusMod.MODID, "set_bus_stop_info"));
 
@@ -48,7 +52,11 @@ public record SetBusStopInfoPayload(BlockPos pos, String name, String id) implem
             if (!state.is(ModBlocks.BUS_STOP.get())) {
                 return;
             }
-            if (!player.canInteractWithBlock(pos, 4.0D)) {
+            if (!player.canInteractWithBlock(pos, MAX_EDIT_DISTANCE)) {
+                return;
+            }
+            if (!canEdit(player)) {
+                player.displayClientMessage(Component.translatable("message.busmod.bus_stop.no_permission"), true);
                 return;
             }
 
@@ -57,5 +65,18 @@ public record SetBusStopInfoPayload(BlockPos pos, String name, String id) implem
                 player.displayClientMessage(Component.translatable("message.busmod.bus_stop.saved"), true);
             }
         });
+    }
+
+    /**
+     * Only creative-mode players and server operators may rename a stop.
+     */
+    private static boolean canEdit(Player player) {
+        if (player.isSpectator()) {
+            return false;
+        }
+        if (player.canUseGameMasterBlocks()) {
+            return true;
+        }
+        return player instanceof ServerPlayer serverPlayer && serverPlayer.hasPermissions(2);
     }
 }
