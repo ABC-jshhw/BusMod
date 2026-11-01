@@ -7,6 +7,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
@@ -54,9 +55,19 @@ public final class VillageUtil {
      */
     public static Optional<VillageInfo> findVillage(ServerLevel level, BlockPos pos) {
         ChunkPos chunkPos = new ChunkPos(pos);
+        var structureRegistry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
         for (String structureId : VILLAGE_STRUCTURES) {
+            ResourceLocation id = ResourceLocation.tryParse(structureId);
+            if (id == null) {
+                continue;
+            }
+            Optional<Holder.Reference<Structure>> holderOpt = structureRegistry.getHolder(id);
+            if (holderOpt.isEmpty()) {
+                continue;
+            }
+            Holder.Reference<Structure> holder = holderOpt.get();
             Optional<StructureStart> start = level.structureManager()
-                    .getStartForStructure(SectionPos.of(chunkPos, level.getMinSection()), structureId, level);
+                    .getStartForStructure(SectionPos.of(chunkPos, level.getMinSection()), holder.value(), level);
             if (start.isEmpty()) {
                 continue;
             }
@@ -65,10 +76,6 @@ public final class VillageUtil {
             if (!bounds.isInside(pos)) {
                 continue;
             }
-            Structure structure = structureStart.getStructure();
-            Holder<Structure> holder = level.registryAccess()
-                    .registryOrThrow(Registries.STRUCTURE)
-                    .wrapAsHolder(structure);
             String name = holder.unwrapKey()
                     .map(key -> key.location().getPath())
                     .orElse(structureId);
