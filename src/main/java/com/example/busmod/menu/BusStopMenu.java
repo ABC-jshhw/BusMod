@@ -59,7 +59,10 @@ public class BusStopMenu extends AbstractContainerMenu {
      */
     @Override
     public boolean stillValid(Player player) {
-        return stillValid(this.access, player, ModBlocks.BUS_STOP.get(), SetBusStopInfoPayload.MAX_EDIT_DISTANCE);
+        return this.access.evaluate((level, blockPos) ->
+                level.getBlockState(blockPos).is(ModBlocks.BUS_STOP.get())
+                        && player.canInteractWithBlock(blockPos, SetBusStopInfoPayload.MAX_EDIT_DISTANCE),
+                true);
     }
 
     @Override
