@@ -21,8 +21,22 @@ import net.neoforged.neoforge.network.PacketDistributor;
  * background is drawn with simple rectangles.
  */
 public class BusStopScreen extends Screen implements MenuAccess<BusStopMenu> {
-    private static final int PANEL_WIDTH = 220;
-    private static final int PANEL_HEIGHT = 150;
+    private static final int PANEL_WIDTH = 240;
+    private static final int PANEL_HEIGHT = 168;
+    private static final int FIELD_WIDTH = 200;
+    private static final int FIELD_HEIGHT = 20;
+    private static final int FIELD_X = (PANEL_WIDTH - FIELD_WIDTH) / 2;
+    private static final int BUTTON_WIDTH = 96;
+    private static final int BUTTON_HEIGHT = 20;
+
+    // Palette
+    private static final int COLOR_SHADOW = 0x66000000;
+    private static final int COLOR_BORDER = 0xFF1B1B1B;
+    private static final int COLOR_PANEL = 0xFFF4F1EA;
+    private static final int COLOR_HEADER = 0xFF15509B;
+    private static final int COLOR_HEADER_ACCENT = 0xFF2E7BD6;
+    private static final int COLOR_TEXT = 0xFF2B2B2B;
+    private static final int COLOR_TEXT_MUTED = 0xFF6B6B6B;
 
     private final BusStopMenu menu;
     private EditBox nameBox;
@@ -40,27 +54,34 @@ public class BusStopScreen extends Screen implements MenuAccess<BusStopMenu> {
         this.leftPos = (this.width - PANEL_WIDTH) / 2;
         this.topPos = (this.height - PANEL_HEIGHT) / 2;
 
-        this.nameBox = new EditBox(this.font, this.leftPos + 20, this.topPos + 44, 180, 20,
+        int fieldX = this.leftPos + FIELD_X;
+
+        this.nameBox = new EditBox(this.font, fieldX, this.topPos + 48, FIELD_WIDTH, FIELD_HEIGHT,
                 Component.translatable("gui.busmod.bus_stop.name"));
         this.nameBox.setMaxLength(BusStopBlockEntity.MAX_NAME_LENGTH);
         this.nameBox.setValue(this.menu.getStopName());
         this.nameBox.setHint(Component.translatable("gui.busmod.bus_stop.name_hint"));
         this.addRenderableWidget(this.nameBox);
 
-        this.idBox = new EditBox(this.font, this.leftPos + 20, this.topPos + 82, 180, 20,
+        this.idBox = new EditBox(this.font, fieldX, this.topPos + 90, FIELD_WIDTH, FIELD_HEIGHT,
                 Component.translatable("gui.busmod.bus_stop.id"));
         this.idBox.setMaxLength(BusStopBlockEntity.MAX_ID_LENGTH);
         this.idBox.setValue(this.menu.getStopId());
         this.idBox.setHint(Component.translatable("gui.busmod.bus_stop.id_hint"));
         this.addRenderableWidget(this.idBox);
 
+        int buttonY = this.topPos + PANEL_HEIGHT - 32;
+        int gap = 8;
+        int totalWidth = BUTTON_WIDTH * 2 + gap;
+        int buttonX = this.leftPos + (PANEL_WIDTH - totalWidth) / 2;
+
         this.addRenderableWidget(Button.builder(Component.translatable("gui.busmod.bus_stop.save"),
                 button -> this.save())
-                .bounds(this.leftPos + 20, this.topPos + 118, 86, 20)
+                .bounds(buttonX, buttonY, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
         this.addRenderableWidget(Button.builder(Component.translatable("gui.cancel"),
                 button -> this.onClose())
-                .bounds(this.leftPos + 114, this.topPos + 118, 86, 20)
+                .bounds(buttonX + BUTTON_WIDTH + gap, buttonY, BUTTON_WIDTH, BUTTON_HEIGHT)
                 .build());
 
         this.setInitialFocus(this.nameBox);
@@ -80,16 +101,41 @@ public class BusStopScreen extends Screen implements MenuAccess<BusStopMenu> {
 
         int x = this.leftPos;
         int y = this.topPos;
-        graphics.fill(x, y, x + PANEL_WIDTH, y + PANEL_HEIGHT, 0xFF2B2B2B);
-        graphics.fill(x + 2, y + 2, x + PANEL_WIDTH - 2, y + PANEL_HEIGHT - 2, 0xFFF3EFE6);
-        graphics.fill(x + 2, y + 2, x + PANEL_WIDTH - 2, y + 28, 0xFF15509B);
-        graphics.drawString(this.font, this.title, x + 10, y + 10, 0xFFFFFFFF, false);
-        graphics.drawString(this.font, Component.translatable("gui.busmod.bus_stop.name"), x + 20, y + 34,
-                0xFF3A3A3A, false);
-        graphics.drawString(this.font, Component.translatable("gui.busmod.bus_stop.id"), x + 20, y + 72,
-                0xFF3A3A3A, false);
+        int right = x + PANEL_WIDTH;
+        int bottom = y + PANEL_HEIGHT;
+
+        // Drop shadow
+        graphics.fill(x + 4, y + 4, right + 4, bottom + 4, COLOR_SHADOW);
+        // Border + panel
+        graphics.fill(x, y, right, bottom, COLOR_BORDER);
+        graphics.fill(x + 1, y + 1, right - 1, bottom - 1, COLOR_PANEL);
+        // Header bar with a lighter accent stripe at the bottom
+        graphics.fill(x + 1, y + 1, right - 1, y + 30, COLOR_HEADER);
+        graphics.fill(x + 1, y + 28, right - 1, y + 30, COLOR_HEADER_ACCENT);
+        graphics.drawString(this.font, this.title, x + 12, y + 11, 0xFFFFFFFF, false);
+
+        // Field labels
+        graphics.drawString(this.font, Component.translatable("gui.busmod.bus_stop.name"),
+                x + FIELD_X, y + 38, COLOR_TEXT, false);
+        graphics.drawString(this.font, Component.translatable("gui.busmod.bus_stop.id"),
+                x + FIELD_X, y + 80, COLOR_TEXT, false);
+
+        // Character counters, right aligned with the fields
+        drawCounter(graphics, this.nameBox, BusStopBlockEntity.MAX_NAME_LENGTH,
+                x + FIELD_X + FIELD_WIDTH, y + 38);
+        drawCounter(graphics, this.idBox, BusStopBlockEntity.MAX_ID_LENGTH,
+                x + FIELD_X + FIELD_WIDTH, y + 80);
+
+        // Footer hint
+        graphics.drawString(this.font, Component.translatable("gui.busmod.bus_stop.hint"),
+                x + FIELD_X, bottom - 14, COLOR_TEXT_MUTED, false);
 
         super.render(graphics, mouseX, mouseY, partialTick);
+    }
+
+    private void drawCounter(GuiGraphics graphics, EditBox box, int maxLength, int right, int y) {
+        String counter = box.getValue().length() + "/" + maxLength;
+        graphics.drawString(this.font, counter, right - this.font.width(counter), y, COLOR_TEXT_MUTED, false);
     }
 
     @Override
