@@ -1,5 +1,6 @@
 {
   "block.busmod.bus_stop": "Bus Stop",
+  "block.busmod.bus_platform": "Bus Platform",
   "itemGroup.busmod": "Bus Mod",
   "gui.busmod.bus_stop.name": "Stop Name",
   "gui.busmod.bus_stop.name_hint": "e.g. Central Station",
@@ -7,6 +8,25 @@
   "gui.busmod.bus_stop.id_hint": "e.g. 001",
   "gui.busmod.bus_stop.save": "Save",
   "gui.busmod.bus_stop.hint": "Enter to save · Esc to cancel",
+  "gui.busmod.bus_stop.village": "Bind village: %s",
+  "gui.busmod.bus_stop.village_named": "Bind village: %s (%s)",
+  "gui.busmod.bus_stop.village.on": "ON",
+  "gui.busmod.bus_stop.village.off": "OFF",
+  "gui.busmod.bus_stop.village_hint": "Detected village: %s",
+  "gui.busmod.bus_stop.village_hint_none": "No village detected nearby",
   "message.busmod.bus_stop.saved": "Bus stop updated",
-  "message.busmod.bus_stop.no_permission": "You are not allowed to edit this bus stop"
+  "message.busmod.bus_stop.no_permission": "You are not allowed to edit this bus stop",
+  "message.busmod.bus_stop.no_village": "No village found nearby, cannot bind",
+  "message.busmod.platform.bound": "Platform bound: %s",
+  "message.busmod.platform.already_bound": "This platform is already bound to a stop",
+  "message.busmod.platform.no_suffix": "All platform letters (A-Z) of this stop are used",
+  "message.busmod.platform.unbound": "This platform is not bound to a stop",
+  "message.busmod.platform.info": "Platform %s",
+  "message.busmod.platform.info_named": "Platform %s · %s",
+  "tooltip.busmod.platform.unbound": "Not bound to a stop",
+  "village.busmod.village_plains": "Plains Village",
+  "village.busmod.village_desert": "Desert Village",
+  "village.busmod.village_savanna": "Savanna Village",
+  "village.busmod.village_snowy": "Snowy Village",
+  "village.busmod.village_taiga": "Taiga Village"
 }

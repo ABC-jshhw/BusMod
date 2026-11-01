@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
-    "busmod:bus_stop"
+    "busmod:bus_stop",
+    "busmod:bus_platform"
   ]
 }

@@ -11,6 +11,9 @@ public final class ModItems {
 
     public static final DeferredItem<BlockItem> BUS_STOP = ITEMS.registerSimpleBlockItem("bus_stop", ModBlocks.BUS_STOP);
 
+    public static final DeferredItem<BlockItem> BUS_PLATFORM =
+            ITEMS.registerSimpleBlockItem("bus_platform", ModBlocks.BUS_PLATFORM);
+
     private ModItems() {
     }
 }

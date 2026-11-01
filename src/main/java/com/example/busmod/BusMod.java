@@ -6,6 +6,7 @@ import com.example.busmod.network.ModPayloads;
 import com.example.busmod.registry.ModBlockEntities;
 import com.example.busmod.registry.ModBlocks;
 import com.example.busmod.registry.ModCreativeTabs;
+import com.example.busmod.registry.ModDataComponents;
 import com.example.busmod.registry.ModItems;
 import com.example.busmod.registry.ModMenus;
 import com.mojang.logging.LogUtils;
@@ -37,6 +38,7 @@ public class BusMod {
         ModBlocks.BLOCKS.register(modEventBus);
         ModItems.ITEMS.register(modEventBus);
         ModBlockEntities.BLOCK_ENTITIES.register(modEventBus);
+        ModDataComponents.DATA_COMPONENTS.register(modEventBus);
         ModMenus.MENUS.register(modEventBus);
         ModCreativeTabs.CREATIVE_MODE_TABS.register(modEventBus);
 
@@ -47,6 +49,7 @@ public class BusMod {
     private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if (event.getTabKey().equals(FUNCTIONAL_BLOCKS)) {
             event.accept(ModItems.BUS_STOP.get());
+            event.accept(ModItems.BUS_PLATFORM.get());
         }
     }
 }

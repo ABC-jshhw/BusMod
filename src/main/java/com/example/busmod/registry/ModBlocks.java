@@ -1,6 +1,7 @@
 package com.example.busmod.registry;
 
 import com.example.busmod.BusMod;
+import com.example.busmod.block.BusPlatformBlock;
 import com.example.busmod.block.BusStopBlock;
 
 import net.minecraft.world.level.block.SoundType;
@@ -19,6 +20,16 @@ public final class ModBlocks {
                     .mapColor(MapColor.METAL)
                     .strength(2.0F, 6.0F)
                     .sound(SoundType.METAL)
+                    .noOcclusion()
+                    .requiresCorrectToolForDrops());
+
+    public static final DeferredBlock<BusPlatformBlock> BUS_PLATFORM = BLOCKS.registerBlock(
+            "bus_platform",
+            BusPlatformBlock::new,
+            BlockBehaviour.Properties.of()
+                    .mapColor(MapColor.STONE)
+                    .strength(1.5F, 6.0F)
+                    .sound(SoundType.STONE)
                     .noOcclusion()
                     .requiresCorrectToolForDrops());
 

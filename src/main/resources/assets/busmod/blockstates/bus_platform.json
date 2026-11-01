@@ -1,0 +1,12 @@
+{
+  "variants": {
+    "facing=north,village=false": { "model": "busmod:block/bus_platform" },
+    "facing=east,village=false": { "model": "busmod:block/bus_platform", "y": 90 },
+    "facing=south,village=false": { "model": "busmod:block/bus_platform", "y": 180 },
+    "facing=west,village=false": { "model": "busmod:block/bus_platform", "y": 270 },
+    "facing=north,village=true": { "model": "busmod:block/bus_platform_village" },
+    "facing=east,village=true": { "model": "busmod:block/bus_platform_village", "y": 90 },
+    "facing=south,village=true": { "model": "busmod:block/bus_platform_village", "y": 180 },
+    "facing=west,village=true": { "model": "busmod:block/bus_platform_village", "y": 270 }
+  }
+}

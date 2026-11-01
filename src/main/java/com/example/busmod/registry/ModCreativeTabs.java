@@ -18,7 +18,10 @@ public final class ModCreativeTabs {
             () -> CreativeModeTab.builder()
                     .title(Component.translatable("itemGroup.busmod"))
                     .icon(() -> new ItemStack(ModItems.BUS_STOP.get()))
-                    .displayItems((parameters, output) -> output.accept(ModItems.BUS_STOP.get()))
+                    .displayItems((parameters, output) -> {
+                        output.accept(ModItems.BUS_STOP.get());
+                        output.accept(ModItems.BUS_PLATFORM.get());
+                    })
                     .build());
 
     private ModCreativeTabs() {

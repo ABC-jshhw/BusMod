@@ -1,5 +1,6 @@
 {
   "block.busmod.bus_stop": "公交车站",
+  "block.busmod.bus_platform": "站台",
   "itemGroup.busmod": "公交模组",
   "gui.busmod.bus_stop.name": "站名",
   "gui.busmod.bus_stop.name_hint": "例如：火车站北广场",
@@ -7,6 +8,25 @@
   "gui.busmod.bus_stop.id_hint": "例如：001",
   "gui.busmod.bus_stop.save": "保存",
   "gui.busmod.bus_stop.hint": "回车保存 · Esc 取消",
+  "gui.busmod.bus_stop.village": "绑定村庄：%s",
+  "gui.busmod.bus_stop.village_named": "绑定村庄：%s（%s）",
+  "gui.busmod.bus_stop.village.on": "开",
+  "gui.busmod.bus_stop.village.off": "关",
+  "gui.busmod.bus_stop.village_hint": "检测到村庄：%s",
+  "gui.busmod.bus_stop.village_hint_none": "附近未检测到村庄",
   "message.busmod.bus_stop.saved": "公交车站已更新",
-  "message.busmod.bus_stop.no_permission": "你没有权限修改该公交车站"
+  "message.busmod.bus_stop.no_permission": "你没有权限修改该公交车站",
+  "message.busmod.bus_stop.no_village": "附近没有检测到村庄，无法绑定",
+  "message.busmod.platform.bound": "站台已绑定：%s",
+  "message.busmod.platform.already_bound": "该站台已经绑定到某个站点",
+  "message.busmod.platform.no_suffix": "该站点的站台编号已用尽（A-Z）",
+  "message.busmod.platform.unbound": "该站台未绑定站点",
+  "message.busmod.platform.info": "站台 %s",
+  "message.busmod.platform.info_named": "站台 %s · %s",
+  "tooltip.busmod.platform.unbound": "未绑定站点",
+  "village.busmod.village_plains": "平原村庄",
+  "village.busmod.village_desert": "沙漠村庄",
+  "village.busmod.village_savanna": "热带草原村庄",
+  "village.busmod.village_snowy": "雪原村庄",
+  "village.busmod.village_taiga": "针叶林村庄"
 }

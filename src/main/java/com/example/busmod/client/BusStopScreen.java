@@ -5,6 +5,7 @@ import org.lwjgl.glfw.GLFW;
 import com.example.busmod.block.BusStopBlockEntity;
 import com.example.busmod.menu.BusStopMenu;
 import com.example.busmod.network.SetBusStopInfoPayload;
+import com.example.busmod.village.VillageUtil;
 
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
@@ -22,7 +23,7 @@ import net.neoforged.neoforge.network.PacketDistributor;
  */
 public class BusStopScreen extends Screen implements MenuAccess<BusStopMenu> {
     private static final int PANEL_WIDTH = 240;
-    private static final int PANEL_HEIGHT = 168;
+    private static final int PANEL_HEIGHT = 196;
     private static final int FIELD_WIDTH = 200;
     private static final int FIELD_HEIGHT = 20;
     private static final int FIELD_X = (PANEL_WIDTH - FIELD_WIDTH) / 2;
@@ -41,6 +42,8 @@ public class BusStopScreen extends Screen implements MenuAccess<BusStopMenu> {
     private final BusStopMenu menu;
     private EditBox nameBox;
     private EditBox idBox;
+    private Button villageButton;
+    private boolean bindVillage;
     private int leftPos;
     private int topPos;
 
@@ -70,6 +73,13 @@ public class BusStopScreen extends Screen implements MenuAccess<BusStopMenu> {
         this.idBox.setHint(Component.translatable("gui.busmod.bus_stop.id_hint"));
         this.addRenderableWidget(this.idBox);
 
+        this.bindVillage = this.menu.isVillageBound();
+        this.villageButton = Button.builder(villageLabel(), button -> {
+            this.bindVillage = !this.bindVillage;
+            button.setMessage(villageLabel());
+        }).bounds(fieldX, this.topPos + 132, FIELD_WIDTH, FIELD_HEIGHT).build();
+        this.addRenderableWidget(this.villageButton);
+
         int buttonY = this.topPos + PANEL_HEIGHT - 32;
         int gap = 8;
         int totalWidth = BUTTON_WIDTH * 2 + gap;
@@ -87,11 +97,23 @@ public class BusStopScreen extends Screen implements MenuAccess<BusStopMenu> {
         this.setInitialFocus(this.nameBox);
     }
 
+    private Component villageLabel() {
+        String village = this.menu.getVillageName();
+        Component state = Component.translatable(this.bindVillage
+                ? "gui.busmod.bus_stop.village.on"
+                : "gui.busmod.bus_stop.village.off");
+        if (village.isEmpty()) {
+            return Component.translatable("gui.busmod.bus_stop.village", state);
+        }
+        return Component.translatable("gui.busmod.bus_stop.village_named", state, village);
+    }
+
     private void save() {
         PacketDistributor.sendToServer(new SetBusStopInfoPayload(
                 this.menu.getPos(),
                 this.nameBox.getValue().strip(),
-                this.idBox.getValue().strip()));
+                this.idBox.getValue().strip(),
+                this.bindVillage));
         this.onClose();
     }
 
@@ -129,6 +151,13 @@ public class BusStopScreen extends Screen implements MenuAccess<BusStopMenu> {
         // Footer hint
         graphics.drawString(this.font, Component.translatable("gui.busmod.bus_stop.hint"),
                 x + FIELD_X, bottom - 14, COLOR_TEXT_MUTED, false);
+
+        // Village binding hint, drawn under the toggle button
+        Component villageHint = this.menu.getVillageName().isEmpty()
+                ? Component.translatable("gui.busmod.bus_stop.village_hint_none")
+                : Component.translatable("gui.busmod.bus_stop.village_hint",
+                        VillageUtil.displayName(this.menu.getVillageName()));
+        graphics.drawString(this.font, villageHint, x + FIELD_X, y + 156, COLOR_TEXT_MUTED, false);
 
         super.render(graphics, mouseX, mouseY, partialTick);
     }

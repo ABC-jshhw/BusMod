@@ -1,5 +1,6 @@
 package com.example.busmod;
 
+import com.example.busmod.client.BusPlatformRenderer;
 import com.example.busmod.client.BusStopRenderer;
 import com.example.busmod.client.BusStopScreen;
 import com.example.busmod.registry.ModBlockEntities;
@@ -28,5 +29,6 @@ public final class BusModClient {
 
     private static void registerBlockEntityRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.BUS_STOP.get(), BusStopRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.BUS_PLATFORM.get(), BusPlatformRenderer::new);
     }
 }

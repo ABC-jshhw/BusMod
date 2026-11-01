@@ -5,12 +5,20 @@ import java.util.Map;
 
 import com.mojang.serialization.MapCodec;
 
+import com.example.busmod.registry.ModBlockEntities;
+import com.example.busmod.registry.ModBlocks;
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -18,6 +26,8 @@ import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -75,6 +85,16 @@ public class BusStopBlock extends BaseEntityBlock {
     }
 
     @Override
+    protected <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level level, BlockState state,
+            BlockEntityType<T> blockEntityType) {
+        if (level.isClientSide) {
+            return null;
+        }
+        return createTickerHelper(blockEntityType, ModBlockEntities.BUS_STOP.get(),
+                BusStopBlockEntity::serverTick);
+    }
+
+    @Override
     protected MenuProvider getMenuProvider(BlockState state, Level level, BlockPos pos) {
         return level.getBlockEntity(pos) instanceof BusStopBlockEntity blockEntity ? blockEntity : null;
     }
@@ -88,10 +108,49 @@ public class BusStopBlock extends BaseEntityBlock {
                 buffer.writeBlockPos(pos);
                 buffer.writeUtf(blockEntity.getStopName(), BusStopBlockEntity.MAX_NAME_LENGTH);
                 buffer.writeUtf(blockEntity.getStopId(), BusStopBlockEntity.MAX_ID_LENGTH);
+                buffer.writeUtf(blockEntity.getVillageName(), BusStopBlockEntity.MAX_VILLAGE_NAME_LENGTH);
+                buffer.writeBoolean(blockEntity.isVillageBound());
             });
         }
 
         return InteractionResult.sidedSuccess(level.isClientSide);
+    }
+
+    /**
+     * Right-clicking a stop while holding an unbound platform item binds the
+     * item to this stop: a free suffix is reserved on the stop and written to
+     * the item's data component. The platform can then be placed.
+     */
+    @Override
+    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos,
+            Player player, InteractionHand hand, BlockHitResult hitResult) {
+        if (!(stack.getItem() instanceof BlockItem blockItem)
+                || !blockItem.getBlock().equals(ModBlocks.BUS_PLATFORM.get())) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (level.isClientSide) {
+            return ItemInteractionResult.SUCCESS;
+        }
+        if (!(level.getBlockEntity(pos) instanceof BusStopBlockEntity stop)) {
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
+        if (PlatformBinding.isBound(stack)) {
+            player.displayClientMessage(Component.translatable("message.busmod.platform.already_bound"), true);
+            return ItemInteractionResult.SUCCESS;
+        }
+
+        String suffix = stop.reservePlatformSuffix();
+        if (suffix == null) {
+            player.displayClientMessage(Component.translatable("message.busmod.platform.no_suffix"), true);
+            return ItemInteractionResult.SUCCESS;
+        }
+
+        PlatformBinding.bind(stack, pos, suffix);
+        String stopId = stop.getStopId();
+        String platformId = stopId.isEmpty() ? suffix : stopId + "-" + suffix;
+        player.displayClientMessage(
+                Component.translatable("message.busmod.platform.bound", platformId), true);
+        return ItemInteractionResult.SUCCESS;
     }
 
     private static Map<Direction, VoxelShape> createShapes() {

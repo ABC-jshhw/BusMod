@@ -1,6 +1,7 @@
 package com.example.busmod.registry;
 
 import com.example.busmod.BusMod;
+import com.example.busmod.block.BusPlatformBlockEntity;
 import com.example.busmod.block.BusStopBlockEntity;
 
 import net.minecraft.core.registries.Registries;
@@ -15,6 +16,11 @@ public final class ModBlockEntities {
     public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BusStopBlockEntity>> BUS_STOP =
             BLOCK_ENTITIES.register("bus_stop", () -> BlockEntityType.Builder
                     .of(BusStopBlockEntity::new, ModBlocks.BUS_STOP.get())
+                    .build(null));
+
+    public static final DeferredHolder<BlockEntityType<?>, BlockEntityType<BusPlatformBlockEntity>> BUS_PLATFORM =
+            BLOCK_ENTITIES.register("bus_platform", () -> BlockEntityType.Builder
+                    .of(BusPlatformBlockEntity::new, ModBlocks.BUS_PLATFORM.get())
                     .build(null));
 
     private ModBlockEntities() {
