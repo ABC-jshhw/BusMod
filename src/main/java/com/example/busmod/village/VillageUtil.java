@@ -66,13 +66,12 @@ public final class VillageUtil {
                 continue;
             }
             Holder.Reference<Structure> holder = holderOpt.get();
-            Optional<StructureStart> start = level.structureManager()
+            StructureStart structureStart = level.structureManager()
                     .getStartForStructure(SectionPos.of(chunkPos, level.getMinSection()), holder.value(),
                             level.getChunk(chunkPos.x, chunkPos.z));
-            if (start.isEmpty()) {
+            if (structureStart == null || !structureStart.isValid()) {
                 continue;
             }
-            StructureStart structureStart = start.get();
             BoundingBox bounds = structureStart.getBoundingBox();
             if (!bounds.isInside(pos)) {
                 continue;
