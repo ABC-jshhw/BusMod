@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.example.busmod.menu.BusStopMenu;
 import com.example.busmod.registry.ModBlockEntities;
+import com.example.busmod.registry.ModBlocks;
 import com.example.busmod.village.VillagePlatformBehaviour;
 
 import net.minecraft.core.BlockPos;
@@ -106,7 +107,7 @@ public class BusStopBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     public AbstractContainerMenu createMenu(int containerId, Inventory playerInventory, Player player) {
         return new BusStopMenu(containerId, playerInventory, this.worldPosition, this.stopName, this.stopId,
-                this.villageName, this.isVillageBound());
+                this.villageName, this.isVillageBound(), "");
     }
 
     public String getStopName() {
@@ -147,6 +148,27 @@ public class BusStopBlockEntity extends BlockEntity implements MenuProvider {
         this.villageName = sanitize(village, MAX_VILLAGE_NAME_LENGTH);
         this.setChanged();
         this.sync();
+        this.refreshPlatforms();
+    }
+
+    /**
+     * Mirrors the village flag of this stop into the {@code VILLAGE} block
+     * state of every platform bound to it, so the model variant follows the
+     * binding without a block entity renderer.
+     */
+    private void refreshPlatforms() {
+        if (!(this.level instanceof ServerLevel serverLevel)) {
+            return;
+        }
+        boolean bound = this.isVillageBound();
+        for (BlockPos platformPos : VillagePlatformBehaviour.findPlatforms(serverLevel, this.worldPosition)) {
+            BlockState platformState = serverLevel.getBlockState(platformPos);
+            if (platformState.is(ModBlocks.BUS_PLATFORM.get())
+                    && platformState.getValue(BusPlatformBlock.VILLAGE) != bound) {
+                serverLevel.setBlock(platformPos, platformState.setValue(BusPlatformBlock.VILLAGE, bound),
+                        Block.UPDATE_ALL);
+            }
+        }
     }
 
     /**

@@ -94,7 +94,7 @@ public record SetBusStopInfoPayload(BlockPos pos, String name, String id, boolea
             return;
         }
 
-        VillageUtil.findVillage(serverLevel, pos).ifPresentOrElse(
+        VillageUtil.findVillage(serverLevel, pos, VillageUtil.SEARCH_RADIUS).ifPresentOrElse(
                 village -> blockEntity.setVillageName(village.name()),
                 () -> player.displayClientMessage(
                         Component.translatable("message.busmod.bus_stop.no_village"), true));

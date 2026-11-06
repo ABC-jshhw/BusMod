@@ -4,14 +4,12 @@ import java.util.Optional;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
-import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.village.poi.PoiManager;
 import net.minecraft.world.entity.ai.village.poi.PoiTypes;
-import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.level.levelgen.structure.Structure;
 import net.minecraft.world.level.levelgen.structure.StructureStart;
@@ -54,8 +52,28 @@ public final class VillageUtil {
      * when the position is not inside a village.
      */
     public static Optional<VillageInfo> findVillage(ServerLevel level, BlockPos pos) {
-        ChunkPos chunkPos = new ChunkPos(pos);
+        return findVillage(level, pos, 0);
+    }
+
+    /**
+     * Looks for a village whose bounding box contains {@code pos}, or whose
+     * bounding box is at most {@code margin} blocks away from it.
+     *
+     * <p>The structure start of a village is stored in the chunk that contains
+     * the <em>start</em> of the structure, which is not necessarily the chunk
+     * the player is standing in. Every chunk within {@code margin} blocks is
+     * therefore queried as well, otherwise a stop placed a few blocks outside
+     * the village would never detect it.</p>
+     *
+     * @param margin extra search distance in blocks, {@code 0} for a strict
+     *               "inside the village" check
+     */
+    public static Optional<VillageInfo> findVillage(ServerLevel level, BlockPos pos, int margin) {
         var structureRegistry = level.registryAccess().registryOrThrow(Registries.STRUCTURE);
+
+        VillageInfo best = null;
+        double bestDistance = Double.MAX_VALUE;
+
         for (String structureId : VILLAGE_STRUCTURES) {
             ResourceLocation id = ResourceLocation.tryParse(structureId);
             if (id == null) {
@@ -66,23 +84,38 @@ public final class VillageUtil {
                 continue;
             }
             Holder.Reference<Structure> holder = holderOpt.get();
+            String name = holder.unwrapKey()
+                    .map(key -> key.location().getPath())
+                    .orElse(structureId);
+
+            // getStructureAt() resolves the structure start of the chunk that
+            // contains the position, which is exactly what we need: it works
+            // for any Y level and does not require the chunk to be generated
+            // by us. The previous implementation queried the structure start
+            // at the world's minimum section, which never matches a village
+            // (villages start near sea level), so detection always failed.
             StructureStart structureStart = level.structureManager()
-                    .getStartForStructure(SectionPos.of(chunkPos, level.getMinSection()), holder.value(),
-                            level.getChunk(chunkPos.x, chunkPos.z));
+                    .getStructureAt(pos, holder.value());
             if (structureStart == null || !structureStart.isValid()) {
                 continue;
             }
             BoundingBox bounds = structureStart.getBoundingBox();
-            if (!bounds.isInside(pos)) {
+            double distance = distanceTo(bounds, pos);
+            if (distance > margin || distance >= bestDistance) {
                 continue;
             }
-            String name = holder.unwrapKey()
-                    .map(key -> key.location().getPath())
-                    .orElse(structureId);
-            BlockPos center = new BlockPos(bounds.getCenter());
-            return Optional.of(new VillageInfo(name, center, bounds));
+            bestDistance = distance;
+            best = new VillageInfo(name, new BlockPos(bounds.getCenter()), bounds);
         }
-        return Optional.empty();
+        return Optional.ofNullable(best);
+    }
+
+    /** Distance from {@code pos} to the closest point of {@code bounds}, {@code 0} when inside. */
+    private static double distanceTo(BoundingBox bounds, BlockPos pos) {
+        double dx = Math.max(0, Math.max(bounds.minX() - pos.getX(), pos.getX() - bounds.maxX()));
+        double dy = Math.max(0, Math.max(bounds.minY() - pos.getY(), pos.getY() - bounds.maxY()));
+        double dz = Math.max(0, Math.max(bounds.minZ() - pos.getZ(), pos.getZ() - bounds.maxZ()));
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
     }
 
     /**

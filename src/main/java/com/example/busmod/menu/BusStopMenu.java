@@ -25,6 +25,7 @@ public class BusStopMenu extends AbstractContainerMenu {
     private final String stopId;
     private final String villageName;
     private final boolean villageBound;
+    private final String nearbyVillage;
 
     /**
      * Client-side constructor invoked by {@code IMenuTypeExtension}.
@@ -34,17 +35,19 @@ public class BusStopMenu extends AbstractContainerMenu {
                 buffer.readUtf(BusStopBlockEntity.MAX_NAME_LENGTH),
                 buffer.readUtf(BusStopBlockEntity.MAX_ID_LENGTH),
                 buffer.readUtf(BusStopBlockEntity.MAX_VILLAGE_NAME_LENGTH),
-                buffer.readBoolean());
+                buffer.readBoolean(),
+                buffer.readUtf(BusStopBlockEntity.MAX_VILLAGE_NAME_LENGTH));
     }
 
     public BusStopMenu(int containerId, Inventory playerInventory, BlockPos pos, String stopName, String stopId,
-            String villageName, boolean villageBound) {
+            String villageName, boolean villageBound, String nearbyVillage) {
         super(ModMenus.BUS_STOP.get(), containerId);
         this.pos = pos;
         this.stopName = stopName == null ? "" : stopName;
         this.stopId = stopId == null ? "" : stopId;
         this.villageName = villageName == null ? "" : villageName;
         this.villageBound = villageBound;
+        this.nearbyVillage = nearbyVillage == null ? "" : nearbyVillage;
         this.access = ContainerLevelAccess.create(playerInventory.player.level(), pos);
     }
 
@@ -68,6 +71,20 @@ public class BusStopMenu extends AbstractContainerMenu {
     /** {@code true} when the stop is currently bound to a village. */
     public boolean isVillageBound() {
         return this.villageBound;
+    }
+
+    /**
+     * Name of the village detected around the stop when the screen was opened,
+     * or an empty string when no village is close enough. The client only uses
+     * this to decide whether the "bind village" toggle is shown.
+     */
+    public String getNearbyVillage() {
+        return this.nearbyVillage;
+    }
+
+    /** {@code true} when a village was detected around the stop. */
+    public boolean hasNearbyVillage() {
+        return !this.nearbyVillage.isEmpty();
     }
 
     /**

@@ -7,10 +7,13 @@ import com.mojang.serialization.MapCodec;
 
 import com.example.busmod.registry.ModBlockEntities;
 import com.example.busmod.registry.ModBlocks;
+import com.example.busmod.village.VillageUtil;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -104,12 +107,20 @@ public class BusStopBlock extends BaseEntityBlock {
             BlockHitResult hitResult) {
         if (!level.isClientSide && player instanceof ServerPlayer serverPlayer
                 && level.getBlockEntity(pos) instanceof BusStopBlockEntity blockEntity) {
+            // Resolve the nearby village on the server so the screen only shows
+            // the "bind village" toggle when there really is one.
+            String nearbyVillage = level instanceof ServerLevel serverLevel
+                    ? VillageUtil.findVillage(serverLevel, pos, VillageUtil.SEARCH_RADIUS)
+                            .map(VillageUtil.VillageInfo::name)
+                            .orElse("")
+                    : "";
             serverPlayer.openMenu(blockEntity, buffer -> {
                 buffer.writeBlockPos(pos);
                 buffer.writeUtf(blockEntity.getStopName(), BusStopBlockEntity.MAX_NAME_LENGTH);
                 buffer.writeUtf(blockEntity.getStopId(), BusStopBlockEntity.MAX_ID_LENGTH);
                 buffer.writeUtf(blockEntity.getVillageName(), BusStopBlockEntity.MAX_VILLAGE_NAME_LENGTH);
                 buffer.writeBoolean(blockEntity.isVillageBound());
+                buffer.writeUtf(nearbyVillage, BusStopBlockEntity.MAX_VILLAGE_NAME_LENGTH);
             });
         }
 
@@ -148,6 +159,9 @@ public class BusStopBlock extends BaseEntityBlock {
         PlatformBinding.bind(stack, pos, suffix);
         String stopId = stop.getStopId();
         String platformId = stopId.isEmpty() ? suffix : stopId + "-" + suffix;
+        // Rename the held item so the player sees which platform it is. The
+        // name is "Platform <stop id>-<suffix>", e.g. "Platform 001-A".
+        stack.set(DataComponents.CUSTOM_NAME, Component.translatable("item.busmod.bus_platform.named", platformId));
         player.displayClientMessage(
                 Component.translatable("message.busmod.platform.bound", platformId), true);
         return ItemInteractionResult.SUCCESS;
